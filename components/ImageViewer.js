@@ -1,7 +1,10 @@
 import { Image, StyleSheet } from "react-native";
 
-export default function ImageViewer({ DefaultBackgroundImage }) {
-  return <Image source={DefaultBackgroundImage} style={styles.image} />;
+export default function ImageViewer({ DefaultBackgroundImage, selectedImage }) {
+  const imageSoucre = selectedImage
+    ? { uri: selectedImage }
+    : DefaultBackgroundImage;
+  return <Image source={imageSoucre} style={styles.image} />;
 }
 
 const styles = StyleSheet.create({

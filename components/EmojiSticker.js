@@ -13,6 +13,7 @@ export default function EmojiSticker({ imageSize, stickerSource }) {
 
   // Track drag gesture
   const drag = Gesture.Pan().onChange(event => {
+    console.log(event);
     translateX.value += event.changeX;
     translateY.value += event.changeY;
   });

@@ -1,10 +1,11 @@
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, View, Platform } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import * as ImagePicker from "expo-image-picker";
 import { useRef, useState } from "react";
 import * as MediaLibrary from "expo-media-library";
 import { captureRef } from "react-native-view-shot";
+import domtoimage from "dom-to-image";
 
 import ImageViewer from "./components/ImageViewer";
 import Button from "./components/Button";
@@ -63,16 +64,36 @@ export default function App() {
   };
 
   const onSaveImageAsync = async () => {
+    // Check if Platform is not Web
+    if (Platform.OS !== "web") {
+      // Screenshot Screen On Android and iOS
+      try {
+        const localUri = await captureRef(imageRef, {
+          height: 440,
+          quality: 1,
+        });
+
+        await MediaLibrary.saveToLibraryAsync(localUri);
+        if (localUri) {
+          alert("Saved!");
+        }
+      } catch (e) {
+        console.log(e);
+      }
+    }
+
+    // Screenshot Screen On Web
     try {
-      const localUri = await captureRef(imageRef, {
+      const dataUrl = await domtoimage.toJpeg(imageRef.current, {
+        quality: 0.95,
+        width: 320,
         height: 440,
-        quality: 1,
       });
 
-      await MediaLibrary.saveToLibraryAsync(localUri);
-      if (localUri) {
-        alert("Saved!");
-      }
+      let link = document.createElement("a");
+      link.download = "sticker-smash.jpeg";
+      link.href = dataUrl;
+      link.click();
     } catch (e) {
       console.log(e);
     }
@@ -130,7 +151,7 @@ export default function App() {
       <EmojiPicker isVisible={isModalVisible} onClose={onModalClose}>
         <EmojiList onSelect={setPickedEmoji} onCloseModal={onModalClose} />
       </EmojiPicker>
-      <StatusBar style='auto' />
+      <StatusBar style='lights' />
     </GestureHandlerRootView>
   );
 }
